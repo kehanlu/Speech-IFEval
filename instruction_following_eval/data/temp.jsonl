@@ -1,0 +1,16 @@
+
+
+
+
+{"key": 3, "prompt": "Make sure to wrap your entire response with double quotes.", "instruction_id_list": ["startend:quotation"], "kwargs": [{}]}
+
+
+
+{"key": 1216, "prompt": "Make sure to wrap your entire response with double quotes", "instruction_id_list": ["startend:quotation"], "kwargs": [{}]}
+{"key": 1220, "prompt": "End your entire response with the exact phrase \"Is there anything else I can help with?\"", "instruction_id_list": ["startend:end_checker"], "kwargs": [{"end_phrase": "Is there anything else I can help with?"}]}
+{"key": 1221, "prompt": "Start your answer with \"Answer:\"", "instruction_id_list": ["combination:repeat_prompt"], "kwargs": [{"prompt_to_repeat": "Answer:"}]}
+{"key": 122, "prompt": "Wrap your entire response with double quotation marks.", "instruction_id_list": ["startend:quotation"], "kwargs": [{}]}
+{"key": 1148, "prompt": "Wrap the entire output in JSON format.", "instruction_id_list": ["detectable_format:json_format"], "kwargs": [{}]}
+{"key": 13, "prompt": "Please wrap your entire answer in JSON format. You can use markdown ticks such as ```. For example:\n```JSON\n{\n...\n}\n```", "instruction_id_list": ["detectable_format:json_format"], "kwargs": [{}]}
+{"key": 14, "prompt": "Please wrap your answer in JSON format with the key: \"answer\"", "instruction_id_list": ["detectable_format:json_format", "keywords:existence"], "kwargs": [{}, {"keywords": ["answer"]}]}
+
