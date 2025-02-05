@@ -26,10 +26,11 @@ from absl import flags
 from absl import logging
 
 from instruction_following_eval import instructions_registry
+from pathlib import Path
 
 
 _INPUT_DATA = flags.DEFINE_string(
-    "input_data", None, "path to input data", required=True
+    "input_data", None, "path to input data", required=False
 )
 
 _INPUT_RESPONSE_DATA = flags.DEFINE_string(
@@ -40,7 +41,7 @@ _OUTPUT_DIR = flags.DEFINE_string(
     "output_dir",
     None,
     "Output directory for inference and eval results.",
-    required=True,
+    required=False,
 )
 
 
@@ -93,48 +94,55 @@ def write_outputs(output_jsonl_filename, outputs):
   assert outputs
   with open(output_jsonl_filename, "w") as f:
     for o in outputs:
-      f.write(
-          json.dumps(
-              {
-                  attr_name: o.__getattribute__(attr_name)
-                  for attr_name in [
-                      name for name in dir(o) if not name.startswith("_")
-                  ]
-              }
-          )
-      )
+      # f.write(
+      #     json.dumps(
+      #         {
+      #             attr_name: o.__getattribute__(attr_name)
+      #             for attr_name in [
+      #                 name for name in dir(o) if not name.startswith("_")
+      #             ]
+      #         }, ensure_ascii=False,
+      #     )
+      # )
+      f.write(json.dumps(o, ensure_ascii=False))
       f.write("\n")
 
 
 def test_instruction_following_strict(
     inp,
-    response
+    result
 ):
   """Tests response to see if instrutions are followed."""
-  instruction_list = inp.instruction_id_list
+  response = result["response"]
+
+  instruction_list = inp["instruction_id_list"]
   is_following_list = []
 
   for index, instruction_id in enumerate(instruction_list):
     instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
     instruction = instruction_cls(instruction_id)
 
-    instruction.build_description(**inp.kwargs[index])
+    instruction.build_description(**inp["kwargs"][index])
     args = instruction.get_instruction_args()
     if args and "prompt" in args:
-      instruction.build_description(prompt=inp.prompt)
+      instruction.build_description(prompt=inp["prompt"])
 
     if response.strip() and instruction.check_following(response):
       is_following_list.append(True)
     else:
       is_following_list.append(False)
 
-  return OutputExample(
-      instruction_id_list=inp.instruction_id_list,
-      prompt=inp.prompt,
-      response=response,
-      follow_all_instructions=all(is_following_list),
-      follow_instruction_list=is_following_list,
-  )
+  result["follow_instruction_list"] = is_following_list
+  result["follow_all_instructions"] = all(is_following_list)
+  return result
+
+  # return OutputExample(
+  #     instruction_id_list=inp.instruction_id_list,
+  #     prompt=inp.prompt,
+  #     response=response,
+  #     follow_all_instructions=all(is_following_list),
+  #     follow_instruction_list=is_following_list,
+  # )
 
 
 def test_instruction_following_loose(
@@ -189,14 +197,14 @@ def test_instruction_following_loose(
   )
 
 
-def read_response_list(input_jsonl_filename):
+def read_result_list(input_jsonl_filename):
   """Creates dictionary matching prompt and response."""
-  response = []
+  results = []
   with open(input_jsonl_filename, "r") as f:
     for l in f:
       example = json.loads(l)
-      response.append(example)
-  return response
+      results.append(example)
+  return results
 
 
 def print_report(outputs):
@@ -213,9 +221,27 @@ def print_report(outputs):
   tier1_total = collections.defaultdict(int)
   tier1_correct = collections.defaultdict(int)
 
+  group_map = {
+    "detectable_format:number_bullet_lists": "bullet_lists",
+    "length_constraints:number_words": "length_constraints",
+    "length_constraints:number_sentences": "length_constraints",
+    "length_constraints:number_paragraphs": "length_constraints",
+    "keywords:forbidden_words": "keywords",
+    "keywords:existence": "keywords",
+    "change_case:english_capital": "change_case",
+    "change_case:english_lowercase": "change_case",
+    "detectable_format:json_format": "json_format",
+    "startend:quotation": "wrapping",
+    "detectable_format:title": "wrapping",
+    "combination:repeat_prompt": "startend",
+    "startend:end_checker": "startend",
+  }
+  group_total = collections.defaultdict(int)
+  group_correct = collections.defaultdict(int)
+
   for example in outputs:
-    follow_instruction_list = example.follow_instruction_list
-    instruction_id_list = example.instruction_id_list
+    follow_instruction_list = example["follow_instruction_list"]
+    instruction_id_list = example["instruction_id_list"]
 
     prompt_total += 1
     if all(follow_instruction_list):
@@ -239,6 +265,14 @@ def print_report(outputs):
       if followed_or_not:
         tier1_correct[instruction_id] += 1
 
+    for instruction_id, followed_or_not in zip(
+        instruction_id_list, follow_instruction_list
+    ):
+      group = group_map.get(instruction_id, "other")
+      group_total[group] += 1
+      if followed_or_not:
+        group_correct[group] += 1
+
   print(f"prompt-level: {prompt_correct / prompt_total}")
   print(f"instruction-level: {instruction_correct / instruction_total}")
   print()
@@ -250,38 +284,56 @@ def print_report(outputs):
     accuracy = tier1_correct[instruction_id] / tier1_total[instruction_id]
     print(f"{instruction_id} {accuracy}")
 
+  print()
+  print("===== Group accuracy =====")
+  for group in sorted(group_total.keys()):
+    accuracy = group_correct[group] / group_total[group]
+    print(f"{group} {accuracy}")
+
 
 def main(argv):
   if len(argv) > 1:
     raise app.UsageError("Too many command-line arguments.")
 
-  inputs = read_key_to_prompt_dict(_INPUT_DATA.value)
-  response_list = read_response_list(
+  # inputs = read_key_to_prompt_dict(_INPUT_DATA.value)
+  results = read_result_list(
       _INPUT_RESPONSE_DATA.value)
+  print(len(results))
 
   # get instruction following results
   for func, output_file_name in [
       (test_instruction_following_strict, "eval_results_strict"),
-      (test_instruction_following_loose, "eval_results_loose"),
+      # (test_instruction_following_loose, "eval_results_loose"),
   ]:
+    input_file_name = _INPUT_RESPONSE_DATA.value.split("/")[-1]
+    output_file_name = f"{input_file_name}@{output_file_name}"
     logging.info("Generating %s...", output_file_name)
     outputs = []
 
-    for response in response_list:
-      key = response["key"]
-      assert key in inputs
+    for result in results:
+      condition = {
+        "key": result["id"],
+        "prompt": result["instruction"],
+        "instruction_id_list": result["instruction_id_list"],
+        "kwargs": result["kwargs"],
+      }
+      # InputExample(key=response["id"],
+      #                  instruction_id_list=response["instruction_id_list"],
+      #                  prompt=response["instruction"],
+      #                  kwargs=response["kwargs"])
 
-      outputs.append(func(inputs[key], response["response"]))
+      outputs.append(func(condition, result))
+    print(len(outputs))
 
     # for inp in inputs:
     #   outputs.append(func(inp, key_to_response))
-    follow_all_instructions = [o.follow_all_instructions for o in outputs]
+    follow_all_instructions = [o["follow_all_instructions"] for o in outputs]
     accuracy = sum(follow_all_instructions) / len(outputs)
     logging.info("Accuracy: %f", accuracy)
 
-    output_file_name = os.path.join(
-        _OUTPUT_DIR.value, output_file_name + ".jsonl"
-    )
+    (Path(_INPUT_RESPONSE_DATA.value).parent / "reports").mkdir(parents=True, exist_ok=True)
+
+    output_file_name = str((Path(_INPUT_RESPONSE_DATA.value).parent / "reports") / f"{output_file_name}.jsonl")
     write_outputs(output_file_name, outputs)
     logging.info("Generated: %s", output_file_name)
 

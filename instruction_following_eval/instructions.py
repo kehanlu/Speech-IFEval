@@ -322,7 +322,8 @@ class BulletListChecker(Instruction):
     """
     bullet_lists = re.findall(r"^\s*\*[^\*].*$", value, flags=re.MULTILINE)
     bullet_lists_2 = re.findall(r"^\s*-.*$", value, flags=re.MULTILINE)
-    num_bullet_lists = len(bullet_lists) + len(bullet_lists_2)
+    bullet_lists_3 = re.findall(r"^\s*•.*$", value, flags=re.MULTILINE)
+    num_bullet_lists = len(bullet_lists) + len(bullet_lists_2) + len(bullet_lists_3)
     return num_bullet_lists == self._num_bullets
 
 
@@ -568,16 +569,19 @@ class ParagraphChecker(Instruction):
       True if the actual number of paragraphs is the same as required;
       otherwise, False.
     """
-    paragraphs = re.split(r"\s?\*\*\*\s?", value)
+    # Split based on *** (with optional spaces) or two or more newlines
+    paragraphs = re.split(r"\s*\*\*\*\s*|\n{1,}", value.strip())
+
     num_paragraphs = len(paragraphs)
-
+    
     for index, paragraph in enumerate(paragraphs):
-      if not paragraph.strip():
-        if index == 0 or index == len(paragraphs) - 1:
-          num_paragraphs -= 1
-        else:
-          return False
-
+        if not paragraph.strip():
+            # If empty, reduce count if it's at start or end, otherwise return False
+            if index == 0 or index == len(paragraphs) - 1:
+                num_paragraphs -= 1
+            else:
+                return False
+            
     return num_paragraphs == self._num_paragraphs
 
 
@@ -1242,7 +1246,7 @@ class RepeatPromptThenAnswer(Instruction):
     return ["prompt_to_repeat"]
 
   def check_following(self, value):
-    if value.strip().lower().startswith(self._prompt_to_repeat.strip().lower()):
+    if value.strip().lower().strip("\"\'").startswith(self._prompt_to_repeat.strip().lower()):
       return True
     return False
 
