@@ -43,25 +43,31 @@ Infrence your model:
 import json
 from pathlib import Path
 
-manifest_paths = ["./data/close-open.jsonl", "./data/close-woprompt.jsonl", "./data/cot.jsonl"]
-output_dir = "/path/to/outputs/"
+manifest_paths = [
+    Path("./data/close-open.jsonl"),
+    Path("./data/close-woprompt.jsonl"),
+    Path("./data/chain-of-thought.jsonl"),
+]
+output_dir = Path("/path/to/outputs/")
+output_dir.mkdir(parents=True, exist_ok=True)
 
 for manifest_path in manifest_paths:
-    manifest_path = Path(manifest_path)
-    
-    with open(Path(output_dir) / manifest_path.name, "w") as fout:
-        audio_filepath = data["audio_filepath"]
-        instruction = data["instruction"]
+    output_file = output_dir / manifest_path.name
 
-        for line in manifest_path.open().readlines():
+    with manifest_path.open("r") as fin, output_file.open("w") as fout:
+        for line in fin:
             data = json.loads(line)
 
-            # TODO: code for inference your model
-            response = model(data)
+            audio_filepath = data.["audio_filepath"]
+            instruction = data.["instruction"]
 
-            data["response"] = response # add a item into data then write outputs
-
+            # TODO: Replace with actual model inference logic
+            response = f"Generated response for {audio_filepath}"
+            
+            
+            data["response"] = response  # Add response to data
             fout.write(json.dumps(data) + "\n")
+
 ```
 
 
