@@ -27,12 +27,8 @@ Input example:
   "instruction": "Convert the provided spoken statement into text.\nYour entire response should be in all capital letters.",
   "dataset": "Automatic_speech_recognition",
   "metric": "wer",
-  "instruction_id_list": [
-    "change_case:english_capital"
-  ],
-  "kwargs": [
-    {}
-  ],
+  "instruction_id_list": ["change_case:english_capital"],
+  "kwargs": [{}],
   "id": 1
 }
 ```
@@ -44,9 +40,10 @@ import json
 from pathlib import Path
 
 manifest_paths = [
-    Path("./data/close-open.jsonl"),
-    Path("./data/close-woprompt.jsonl"),
-    Path("./data/chain-of-thought.jsonl"),
+    Path(data_dir) / "eval_data/close.jsonl",
+    Path(data_dir) / "eval_data/open.jsonl",
+    Path(data_dir) / "eval_data/close-woprompt.jsonl",
+    Path(data_dir) / "eval_data/chain-of-thought.jsonl",
 ]
 output_dir = Path("/path/to/outputs/")
 output_dir.mkdir(parents=True, exist_ok=True)
@@ -64,15 +61,16 @@ for manifest_path in manifest_paths:
             # TODO: Replace with actual model inference logic
             response = f"Generated response for {audio_filepath}"
             
-            
             data["response"] = response  # Add response to data
             fout.write(json.dumps(data) + "\n")
 
 ```
 
 
-Evaluate instruction following:
+Evaluate instruction-following rate:
 
 ```
-python3 -m instruction_following_eval.evaluation_main --input_response_data=/path/to/outputs/close-open.jsonl
+python -m instruction_following_eval.evaluation_main --input_response_data=/path/to/outputs/close.jsonl
+
+python -m instruction_following_eval.evaluation_main --input_response_data=/path/to/outputs/open.jsonl
 ```
