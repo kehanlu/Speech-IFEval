@@ -301,12 +301,11 @@ def main(argv):
   print(len(results))
 
   # get instruction following results
-  for func, output_file_name in [
-      (test_instruction_following_strict, "eval_results_strict"),
-      # (test_instruction_following_loose, "eval_results_loose"),
+  for func in [
+      test_instruction_following_strict,
   ]:
     input_file_name = _INPUT_RESPONSE_DATA.value.split("/")[-1]
-    output_file_name = f"{input_file_name}@{output_file_name}"
+    output_file_name = f"rule_eval@{input_file_name}"
     logging.info("Generating %s...", output_file_name)
     outputs = []
 

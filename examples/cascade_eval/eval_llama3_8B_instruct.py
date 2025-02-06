@@ -20,9 +20,8 @@ def arg_parser():
 def main(args):
     data_dir = Path(args.data_dir)
     output_dir = Path(args.output_dir) / args.model_id.replace("/", "--")
+    (output_dir / "logs").mkdir(parents=True, exist_ok=True)
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
 
     
     manifest_paths = [
