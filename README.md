@@ -1,6 +1,7 @@
 ## Audio data
 
 ```
+cd data
 wget https://huggingface.co/datasets/kehanlu/IFeval-Speech/resolve/main/audios.tar
 
 tar -xvf audios.tar
@@ -8,11 +9,18 @@ tar -xvf audios.tar
 
 **Folde structure:**
 ```
-audios/
-├── Automatic_speech_recognition/
-├── Gender_recognition/
-├── Speech_emotion_recognition/
-└── MMAU/
+data/
+│── eval_data/
+│   │── close.jsonl
+│   │── open.jsonl
+│   │── close-woprompt.jsonl
+│   │── chain-of-thought.jsonl
+│
+│── audios/
+│   │── Automatic_speech_recognition/
+│   │── Gender_recognition/
+│   │── Speech_emotion_recognition/
+│   │── MMAU/
 ```
 
 
