@@ -46,8 +46,7 @@ def generate_eval_response(data):
 Model's Response is a reply to the Question. Your task is to judge if "Model's Response" aligns with the "Ground Truth Answer" based on the "Question". 
 Please strictly follow the guidelines below:
 - Answer with the format "Result: <YES or NO>" at the end.
-- Output "YES" if the response aligns with the ground truth answer; output "NO" if the response does not match the ground truth answer or contain more than one answer.
-- The question is single-choice, so model's response should contain one and only one answer. Therefore, if the model's response does not clearly indicate only an answer or select more than one answer, you should mark it as incorrect, and output "NO".
+- Output "YES" if the response aligns with the ground truth answer; output "NO" if the response does not match the ground truth answer.
 """
         content = f"""Question: {instruction}\nGround Truth Answer: {label}\nModel's Response: {model_response}"""
 
@@ -105,6 +104,8 @@ def main(args):
         with input_response_data_path.open("r") as fin, tmp_output_file.open("w") as fout:
             datas = [json.loads(line) for line in fin.readlines()]
             for data in tqdm(datas):
+                if data["metric"] != "accuracy":
+                    continue
                 response = generate_eval_response(data)
                 data["eval_response"] = response
                 fout.write(json.dumps(data) + "\n")
