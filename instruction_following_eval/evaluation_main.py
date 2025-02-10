@@ -289,7 +289,7 @@ def print_report(outputs):
   for group in sorted(group_total.keys()):
     accuracy = group_correct[group] / group_total[group]
     print(f"{group} {accuracy}")
-
+  print(f"instruction-level: {instruction_correct / instruction_total}")
 
 def main(argv):
   if len(argv) > 1:
@@ -340,6 +340,7 @@ def main(argv):
     print("=" * 64)
     print(f"{output_file_name} Accuracy Scores:")
     print_report(outputs)
+  print(output_file_name)
 
 
 if __name__ == "__main__":
