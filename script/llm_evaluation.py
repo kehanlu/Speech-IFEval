@@ -10,6 +10,7 @@ from collections import defaultdict
 from jiwer import wer
 import re
 from openai import OpenAI
+from time import sleep
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -82,7 +83,8 @@ Please strictly follow the guidelines below:
     response = response.choices[0].message.content
     if data["metric"] == "wer" and (normalize_text(response) not in normalize_text(model_response)):
         logging.warning(f"{'='*79}\n{normalize_text(model_response)}\n{'*'*79}\n{normalize_text(response)}\n{'='*79}")
-
+    
+    sleep(0.3)
     return response
 
 def main(args):
