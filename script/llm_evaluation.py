@@ -104,8 +104,6 @@ def main(args):
         with input_response_data_path.open("r") as fin, tmp_output_file.open("w") as fout:
             datas = [json.loads(line) for line in fin.readlines()]
             for data in tqdm(datas):
-                if data["metric"] != "accuracy":
-                    continue
                 response = generate_eval_response(data)
                 data["eval_response"] = response
                 fout.write(json.dumps(data) + "\n")
