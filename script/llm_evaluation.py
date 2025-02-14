@@ -16,7 +16,9 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def normalize_text(text):
     normalizer = BasicTextNormalizer()
-    return normalizer(text).strip()
+    normalized_text = text.replace("<", "").replace(">", "")
+    normalized_text = normalizer(normalized_text).strip()
+    return normalized_text
 
 def extract_result(text):
     pattern = r"(?i)(?<=result:\s)(yes|no)"
@@ -35,8 +37,11 @@ def arg_parser():
 
     return parser.parse_args()
 
-def generate_eval_response(data):
+def generate_eval_response(data, remove_instruction=False):
     instruction = data["instruction"]
+    if remove_instruction:
+        instruction = "\n".join(instruction.split("\n")[:-1])
+        print(instruction)
     label = data.get("label")
     model_response = data["response"]
 
@@ -84,7 +89,7 @@ Please strictly follow the guidelines below:
         logging.warning(f"{'='*79}\n{normalize_text(model_response)}\n{'*'*79}\n{normalize_text(response)}\n{'='*79}")
     
     sleep(0.3)
-    return response
+    return messages, response
 
 def main(args):
     input_response_data_path = Path(args.input_response_data)
@@ -104,8 +109,9 @@ def main(args):
         with input_response_data_path.open("r") as fin, tmp_output_file.open("w") as fout:
             datas = [json.loads(line) for line in fin.readlines()]
             for data in tqdm(datas):
-                response = generate_eval_response(data)
+                messages, response = generate_eval_response(data, remove_instruction=(input_response_data_path.stem in ["close", "close.1"]))
                 data["eval_response"] = response
+                data["messages"] = messages
                 fout.write(json.dumps(data) + "\n")
                 logging.info(json.dumps(data))
 
@@ -116,8 +122,8 @@ def main(args):
             datas = [json.loads(line) for line in fin.readlines()]
             
             dataset_group = defaultdict(list)
-            hyp = []
-            ref = []
+            hyps = []
+            refs = []
             for data in tqdm(datas):
                 if data["metric"] == "accuracy":
                     result = extract_result(data["eval_response"])
@@ -129,9 +135,11 @@ def main(args):
                         data["correct"] = False
                 
                 elif data["metric"] == "wer":
-                    hyp.append(normalize_text(data["eval_response"]))
-                    ref.append(normalize_text(data["label"]))
-                    data["correct"] = wer(truth=ref, hypothesis=hyp)
+                    hyp = normalize_text(data["eval_response"])
+                    ref = normalize_text(data["label"])
+                    hyps.append(hyp)
+                    refs.append(ref)
+                    data["correct"] = wer(truth=[ref], hypothesis=[hyp])
 
                 elif data["metric"] == "cot":
                     result = extract_result(data["eval_response"])
@@ -145,8 +153,8 @@ def main(args):
                 fout.write(json.dumps(data) + "\n")
         
     # print report
-    if ref:
-        wer_score = wer(truth=ref, hypothesis=hyp)
+    if refs:
+        wer_score = wer(truth=refs, hypothesis=hyps)
         logging.info(f"WER: {wer_score}")
         print(f"WER: {wer_score}")
     for dataset, correct in dataset_group.items():
