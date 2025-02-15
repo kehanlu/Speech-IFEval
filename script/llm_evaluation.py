@@ -40,7 +40,7 @@ def arg_parser():
 def generate_eval_response(data, remove_instruction=False):
     instruction = data["instruction"]
     if remove_instruction:
-        instruction = "\n".join(instruction.split("\n")[:-1])
+        instruction = instruction.split("\n")[0]
         print(instruction)
     label = data.get("label")
     model_response = data["response"]
