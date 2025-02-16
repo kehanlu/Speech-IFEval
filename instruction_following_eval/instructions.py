@@ -320,10 +320,12 @@ class BulletListChecker(Instruction):
       True if the actual number of bullet lists in the response meets the
       requirement.
     """
+    value = value.replace("\\n", "\n")
     bullet_lists = re.findall(r"^\s*\*[^\*].*$", value, flags=re.MULTILINE)
     bullet_lists_2 = re.findall(r"^\s*-.*$", value, flags=re.MULTILINE)
     bullet_lists_3 = re.findall(r"^\s*•.*$", value, flags=re.MULTILINE)
-    num_bullet_lists = len(bullet_lists) + len(bullet_lists_2) + len(bullet_lists_3)
+    bullet_lists_4 = re.findall(r"^\s*\d.*$", value, flags=re.MULTILINE)
+    num_bullet_lists = len(bullet_lists) + len(bullet_lists_2) + len(bullet_lists_3) + len(bullet_lists_4)
     return num_bullet_lists == self._num_bullets
 
 
