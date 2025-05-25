@@ -33,7 +33,7 @@ def arg_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--input_response_data", "-i", type=str, required=True)
-    parser.add_argument("--stage", type=int, default=0)
+    parser.add_argument("--stage", type=int, default=0, help="Starting stage. 0: Generate LLM evaluation results (generate a temporary file); 1: Performance evaluation (generate a final result from the temporary file)")
 
     return parser.parse_args()
 

@@ -21,12 +21,13 @@ import json
 import os
 from typing import Dict, Optional, Sequence, Union
 
-from absl import app
 from absl import flags
 from absl import logging
 
 from instruction_following_eval import instructions_registry
 from pathlib import Path
+
+import argparse
 
 
 _INPUT_DATA = flags.DEFINE_string(
@@ -94,16 +95,6 @@ def write_outputs(output_jsonl_filename, outputs):
   assert outputs
   with open(output_jsonl_filename, "w") as f:
     for o in outputs:
-      # f.write(
-      #     json.dumps(
-      #         {
-      #             attr_name: o.__getattribute__(attr_name)
-      #             for attr_name in [
-      #                 name for name in dir(o) if not name.startswith("_")
-      #             ]
-      #         }, ensure_ascii=False,
-      #     )
-      # )
       f.write(json.dumps(o, ensure_ascii=False))
       f.write("\n")
 
@@ -114,6 +105,7 @@ def test_instruction_following_strict(
 ):
   """Tests response to see if instrutions are followed."""
   response = result["response"]
+
 
   instruction_list = inp["instruction_id_list"]
   is_following_list = []
@@ -136,13 +128,6 @@ def test_instruction_following_strict(
   result["follow_all_instructions"] = all(is_following_list)
   return result
 
-  # return OutputExample(
-  #     instruction_id_list=inp.instruction_id_list,
-  #     prompt=inp.prompt,
-  #     response=response,
-  #     follow_all_instructions=all(is_following_list),
-  #     follow_instruction_list=is_following_list,
-  # )
 
 
 def test_instruction_following_loose(
@@ -285,26 +270,39 @@ def print_report(outputs):
     print(f"{instruction_id} {accuracy}")
 
   print()
-  print("===== Group accuracy =====")
+  print("===== Speech-IFEval accuracy =====")
   for group in sorted(group_total.keys()):
     accuracy = group_correct[group] / group_total[group]
     print(f"{group} {accuracy}")
-  print(f"instruction-level: {instruction_correct / instruction_total}")
+  print(f"\nALL: {instruction_correct / instruction_total}")
+  print("===================================")
 
-def main(argv):
-  if len(argv) > 1:
-    raise app.UsageError("Too many command-line arguments.")
+
+def parse_args():
+  """Parses command line arguments."""
+  parser = argparse.ArgumentParser(description="Instruction Following Evaluation")
+  parser.add_argument(
+      "--input_response_data",
+      "-i",
+      type=str,
+      required=True,
+      help="Path to input response data in JSONL format.",
+  )
+  return parser.parse_args()
+
+
+def main():
+  args = parse_args()
 
   # inputs = read_key_to_prompt_dict(_INPUT_DATA.value)
-  results = read_result_list(
-      _INPUT_RESPONSE_DATA.value)
+  results = read_result_list(args.input_response_data)
   print(len(results))
 
   # get instruction following results
   for func in [
       test_instruction_following_strict,
   ]:
-    input_file_name = _INPUT_RESPONSE_DATA.value.split("/")[-1]
+    input_file_name = args.input_response_data.split("/")[-1]
     output_file_name = f"rule_eval@{input_file_name}"
     logging.info("Generating %s...", output_file_name)
     outputs = []
@@ -312,17 +310,11 @@ def main(argv):
     for result in results:
       condition = {
         "key": result["id"],
-        "prompt": result["instruction"],
         "instruction_id_list": result["instruction_id_list"],
         "kwargs": result["kwargs"],
       }
-      # InputExample(key=response["id"],
-      #                  instruction_id_list=response["instruction_id_list"],
-      #                  prompt=response["instruction"],
-      #                  kwargs=response["kwargs"])
 
       outputs.append(func(condition, result))
-    print(len(outputs))
 
     # for inp in inputs:
     #   outputs.append(func(inp, key_to_response))
@@ -330,9 +322,9 @@ def main(argv):
     accuracy = sum(follow_all_instructions) / len(outputs)
     logging.info("Accuracy: %f", accuracy)
 
-    (Path(_INPUT_RESPONSE_DATA.value).parent / "reports").mkdir(parents=True, exist_ok=True)
+    (Path(args.input_response_data).parent / "reports").mkdir(parents=True, exist_ok=True)
 
-    output_file_name = str((Path(_INPUT_RESPONSE_DATA.value).parent / "reports") / f"{output_file_name}.jsonl")
+    output_file_name = str((Path(args.input_response_data).parent / "reports") / f"{output_file_name}.jsonl")
     write_outputs(output_file_name, outputs)
     logging.info("Generated: %s", output_file_name)
 
@@ -344,4 +336,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-  app.run(main)
+  main()

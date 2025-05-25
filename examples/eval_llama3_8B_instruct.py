@@ -13,7 +13,6 @@ def arg_parser():
     
     parser.add_argument("--data_dir", type=str, default="./data")
     parser.add_argument("--output_dir", type=str, default="./outputs")
-    parser.add_argument("--device", type=str, default="auto")
     
     return parser.parse_args()
 
@@ -22,13 +21,12 @@ def main(args):
     output_dir = Path(args.output_dir) / args.model_id.replace("/", "--")
     (output_dir / "logs").mkdir(parents=True, exist_ok=True)
 
-
     
     manifest_paths = [
-        Path(data_dir) / "eval_data/close.jsonl",
-        Path(data_dir) / "eval_data/open.jsonl",
-        Path(data_dir) / "eval_data/close-woprompt.jsonl",
+        Path(data_dir) / "eval_data/closed_ended_questions.jsonl",
+        Path(data_dir) / "eval_data/creative_writing.jsonl",
         Path(data_dir) / "eval_data/chain-of-thought.jsonl",
+        Path(data_dir) / "eval_data/closed_ended_questions-woprompt.jsonl",
     ]
 
     # Load model
@@ -38,7 +36,7 @@ def main(args):
     model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
         torch_dtype=torch.bfloat16,
-        device_map=args.device,
+        device_map="auto",
         cache_dir=os.getenv("HF_HOME"),
         token=os.getenv("HF_TOKEN"),
     )
@@ -58,10 +56,10 @@ def main(args):
 
             for data in tqdm(datas):
                 instruction = data["instruction"]
-                seed_transcript = data["seed_transcript"]
+                textual_audio = data["textual_audio"]
 
                 # TODO: Replace with actual model inference logic
-                content = f"""Speech Input: {seed_transcript}\n\n{instruction}"""
+                content = f"""Speech Input: {textual_audio}\n\n{instruction}"""
                 messages = [
                     {"role": "system", "content": "Follow the given instructions."},
                     {"role": "user", "content": content},
@@ -93,6 +91,8 @@ def main(args):
                 
                 fout.write(json.dumps(data) + "\n")
                 logging.info(json.dumps(data))
+
+                break
 
 if __name__ == "__main__":
     args = arg_parser()
