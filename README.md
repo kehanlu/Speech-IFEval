@@ -12,18 +12,15 @@ We aim to evaluate the **textual knowledge** of Speech-Aware Language Models (SL
 
 ## 🏆 Leaderboard
 
-| Rank | Model            | Closed-ended (%) | Creative Writing (%) | CoT (%) | **IFrate (%)** | Δ (Forgetting Rate) |
+| Rank | Model            | Closed-ended (%) | Creative Writing (%) | CoT (%) | **IFrate (%)** | **Δ (Forgetting Rate)** |
 |------|------------------|------------------|-----------------------|---------|----------------|----------------------|
-| 1    | DeSTA2        | 83.71             | 91.75                 | **91.50**   | **89.23**       | **-3.57**               |
+| 1    | DeSTA2        | 83.71             | 91.75                 | 91.50   | **89.23**       | **-3.57**               |
 | 2    | DiVA              | 83.14             | 61.75                 | 83.50   | 76.13           | -17.73              |
 | 3    | BLSP-emo          | 66.35             | 63.75                 | 50.50   | 60.20           | -17.92              |
-| 4    | SALMONN (α=1)     | 66.34             | 72.25                 | 59.00   | 65.86           | -11.08              |
-| 5    | SALMONN (α=4)     | 68.92             | 77.25                 | 58.00   | 68.06           | -8.12               |
-| 6    | SALMONN (α=16)    | 71.28             | 73.50                 | 48.00   | 64.26           | -13.24              |
-| 7    | Qwen2-Audio-Instruct | 41.59         | 67.75                 | 32.00   | 47.11           | –                    |
-| 8   | SALMONN           | 37.41             | 61.25                 | 12.00   | 36.89           | -50.20              |
-| 9    | Qwen-Audio-Chat   | 10.93             | 56.00                 | 32.00   | 32.98           | –                    |
-| 10    | LTU-AS            | 28.83             | 47.75                 | 11.00   | 29.19           | -54.90              |
+| 4    | Qwen2-Audio-Instruct | 41.59         | 67.75                 | 32.00   | 47.11           | –                    |
+| 5   | SALMONN           | 37.41             | 61.25                 | 12.00   | 36.89           | -50.20              |
+| 6    | Qwen-Audio-Chat   | 10.93             | 56.00                 | 32.00   | 32.98           | –                    |
+| 7    | LTU-AS            | 28.83             | 47.75                 | 11.00   | 29.19           | -54.90              |
 
 > **Note:** IFrate is the average of Closed-ended, Creative Writing, and CoT following rates.  
 > Forgetting Rate (Δ) is computed relative to each model’s original text-only LLM.
@@ -41,6 +38,7 @@ We aim to evaluate the **textual knowledge** of Speech-Aware Language Models (SL
 ```bash
 git clone https://github.com/kehanlu/Speech-IFEval.git
 cd Speech-IFEval
+pip install -r requirements.txt
 ```
 
 📥 Download Audio Files
@@ -123,7 +121,7 @@ python examples/eval_llama3_8B_instruct.py --data /lab/Speech-IFEval/data --outp
 **Calculate Forgetting Rate (Δ)**
 
 $$
-\Delta = \frac{\text{IFrate}_{\text{SLM}} - \text{IFrate}_{\text{Ref}}}{\text{IFrate}_{\text{Ref}}} = \frac{89.23 - 92.53}{92.53} = -3.57\%
+Δ = (IFrate_{SLM} - IFrate_{Ref}) / (IFrate_{Ref}) = (89.23 - 92.53) / (92.53) = -3.57
 $$
 
 | Model            | IFrate | Δ (Forgetting Rate) |
