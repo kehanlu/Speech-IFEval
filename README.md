@@ -1,11 +1,14 @@
 
-# Speech-IFEval
+# Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models
 
-> **Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models**
-> 
-> Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee / National Taiwan University
+- Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee
+- National Taiwan University
+- Accepted to **Interspeech 2025**
 
 [![](https://img.shields.io/badge/arxiv-2505.19037-brightgreen)](https://arxiv.org/abs/2505.19037)
+
+- ⁉️ Most speech-aware language models (SLMs) are built from an instruction-tuned LLM, but we found they cannot follow even simple output constraints!
+- 🤔 The catastrophic forgetting problem is often observed in SLM development, but we don't have an evaluation metric to measure it!
 
 ![](https://github.com/user-attachments/assets/6f13b716-5bfa-42b6-af8d-efeba49cc8eb)
 
@@ -159,10 +162,13 @@ python script/llm_evaluation.py -i outputs/DeSTA-ntu--DeSTA2-8B-beta/closed_ende
 ### Citation
 
 ```bibtex
-@inproceedings{Lu_interspeech,
-  title     = {Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models},
-  author    = {Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee},
-  year      = {2025},
-  booktitle = {Interspeech 2025},
+@article{lu2025speechifeval,
+      title={Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models}, 
+      author={Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee},
+      year={2025},
+      eprint={2505.19037},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2505.19037}, 
 }
 ```
