@@ -7,21 +7,32 @@
 
 [![](https://img.shields.io/badge/arxiv-2505.19037-brightgreen)](https://arxiv.org/abs/2505.19037)
 
-We aim to evaluate the **instruction-following ability** and **catastrophic forgetting problem** of Speech-Aware Language Models (SLMs).
-- We find that most SLMs suffer from catastrophic forgetting after speech-text training.
-- Existing benchmarks focus only on task-level performance (e.g., accuracy), making it unclear whether poor results stem from speech perception issues or difficulty understanding textual instructions or questions.
+![](https://github.com/user-attachments/assets/6f13b716-5bfa-42b6-af8d-efeba49cc8eb)
 
 ## 🏆 Leaderboard
 
-| Rank | Model            | Closed-ended (%) | Creative Writing (%) | CoT (%) | **IFrate (%)** | **Δ (Forgetting Rate)** |
-|------|------------------|------------------|-----------------------|---------|----------------|----------------------|
-| 1    | [DeSTA2](https://arxiv.org/abs/2409.20007)| 83.71             | 91.75                 | 91.50   | **89.23**       | **-3.57**               |
-| 2    | [DiVA](https://arxiv.org/abs/2410.02678)              | 83.14             | 61.75                 | 83.50   | 76.13           | -17.73              |
-| 3    | [BLSP-emo](https://arxiv.org/abs/2406.03872)          | 66.35             | 63.75                 | 50.50   | 60.20           | -17.92              |
-| 4    | [Qwen2-Audio-Instruct](https://arxiv.org/abs/2407.10759) | 41.59         | 67.75                 | 32.00   | 47.11           | –                    |
-| 5   | [SALMONN](https://arxiv.org/abs/2310.13289)           | 37.41             | 61.25                 | 12.00   | 36.89           | -50.20              |
-| 6    | [Qwen-Audio-Chat](https://arxiv.org/abs/2311.07919)   | 10.93             | 56.00                 | 32.00   | 32.98           | –                    |
-| 7    | [LTU-AS](https://arxiv.org/abs/2309.14405)            | 28.83             | 47.75                 | 11.00   | 29.19           | -54.90              |
+| Rank | Model                         | Closed-ended (%) | Creative Writing (%) | CoT (%) | **IFrate (%)** | **Δ (Forgetting Rate)** |
+|------|-------------------------------|------------------|-----------------------|---------|----------------|--------------------------|
+|| **SLMs**||||||
+| 1    | [DeSTA2](https://arxiv.org/abs/2409.20007)            | 83.71               | 91.75                 | 91.50   | **89.23**       | **-3.57**               |
+| 2    | [DiVA](https://arxiv.org/abs/2410.02678)              | 83.14               | 61.75                 | 83.50   | 76.13           | -17.73                  |
+| 3    | [BLSP-emo](https://arxiv.org/abs/2406.03872)          | 66.35               | 63.75                 | 50.50   | 60.20           | -17.92                  |
+| 4    | [Qwen2-Audio-Instruct](https://arxiv.org/abs/2407.10759) | 41.59           | 67.75                 | 32.00   | 47.11           | –                        |
+| 5    | [SALMONN](https://arxiv.org/abs/2310.13289)           | 37.41               | 61.25                 | 12.00   | 36.89           | -50.20                  |
+| 6    | [Qwen-Audio-Chat](https://arxiv.org/abs/2311.07919)   | 10.93               | 56.00                 | 32.00   | 32.98           | –                        |
+| 7    | [LTU-AS](https://arxiv.org/abs/2309.14405)            | 28.83               | 47.75                 | 11.00   | 29.19           | -54.90                  |
+|| **Reference systems** (cascade)||||||
+|     | Llama3.1-8B-Instruct           | 88.32               | 93.75                 | 98.50   | 93.52       | –                        |
+|     | Llama3-8B-Instruct             | 93.35               | 93.75                 | 90.50   | 92.53           | –                        |
+|     | Llama2-7B-Chat                 | 62.27               | 71.00                 | 92.50   | 75.26           | –                        |
+|     | Qwen2.5-7B-Instruct            | 95.71               | 83.25                 | 71.00   | 88.49           | –                        |
+|     | Qwen2-7B-Instruct              | 95.82               | 86.00                 | 67.50   | 83.11           | –                        |
+|     | Qwen-7B-chat                    | 62.27               | 75.25                 | 82.50   | 73.34           | –                        |
+|     | Vicuna 13B v1.1                 | 72.45               | 78.25                 | 71.50   | 74.07           | –                        |
+|     | Vicuna 7B v1.1                  | 52.20               | 78.00                 | 64.00   | 64.73           | –                        |
+
+
+
 
 > **Note:** IFrate is the average of Closed-ended, Creative Writing, and CoT following rates.  
 > Forgetting Rate (Δ) is computed relative to each model’s original text-only LLM.
