@@ -4,10 +4,12 @@
 > **Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models**
 > 
 > Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee
->
+> 
 > National Taiwan University
 
-We aim to evaluate the **textual knowledge** of Speech-Aware Language Models (SLMs).
+[![](https://img.shields.io/badge/arxiv-2505.19037-brightgreen)](https://arxiv.org/abs/2505.19037)
+
+We aim to evaluate the **instruction-following ability** and **catastrophic forgetting problem** of Speech-Aware Language Models (SLMs).
 - We find that most SLMs suffer from catastrophic forgetting after speech-text training.
 - Existing benchmarks focus only on task-level performance (e.g., accuracy), making it unclear whether poor results stem from speech perception issues or difficulty understanding textual instructions or questions.
 
@@ -15,13 +17,13 @@ We aim to evaluate the **textual knowledge** of Speech-Aware Language Models (SL
 
 | Rank | Model            | Closed-ended (%) | Creative Writing (%) | CoT (%) | **IFrate (%)** | **Δ (Forgetting Rate)** |
 |------|------------------|------------------|-----------------------|---------|----------------|----------------------|
-| 1    | DeSTA2        | 83.71             | 91.75                 | 91.50   | **89.23**       | **-3.57**               |
-| 2    | DiVA              | 83.14             | 61.75                 | 83.50   | 76.13           | -17.73              |
-| 3    | BLSP-emo          | 66.35             | 63.75                 | 50.50   | 60.20           | -17.92              |
-| 4    | Qwen2-Audio-Instruct | 41.59         | 67.75                 | 32.00   | 47.11           | –                    |
-| 5   | SALMONN           | 37.41             | 61.25                 | 12.00   | 36.89           | -50.20              |
-| 6    | Qwen-Audio-Chat   | 10.93             | 56.00                 | 32.00   | 32.98           | –                    |
-| 7    | LTU-AS            | 28.83             | 47.75                 | 11.00   | 29.19           | -54.90              |
+| 1    | [DeSTA2](https://arxiv.org/abs/2409.20007)| 83.71             | 91.75                 | 91.50   | **89.23**       | **-3.57**               |
+| 2    | [DiVA](https://arxiv.org/abs/2410.02678)              | 83.14             | 61.75                 | 83.50   | 76.13           | -17.73              |
+| 3    | [BLSP-emo](https://arxiv.org/abs/2406.03872)          | 66.35             | 63.75                 | 50.50   | 60.20           | -17.92              |
+| 4    | [Qwen2-Audio-Instruct](https://arxiv.org/abs/2407.10759) | 41.59         | 67.75                 | 32.00   | 47.11           | –                    |
+| 5   | [SALMONN](https://arxiv.org/abs/2310.13289)           | 37.41             | 61.25                 | 12.00   | 36.89           | -50.20              |
+| 6    | [Qwen-Audio-Chat](https://arxiv.org/abs/2311.07919)   | 10.93             | 56.00                 | 32.00   | 32.98           | –                    |
+| 7    | [LTU-AS](https://arxiv.org/abs/2309.14405)            | 28.83             | 47.75                 | 11.00   | 29.19           | -54.90              |
 
 > **Note:** IFrate is the average of Closed-ended, Creative Writing, and CoT following rates.  
 > Forgetting Rate (Δ) is computed relative to each model’s original text-only LLM.
@@ -147,7 +149,7 @@ python script/llm_evaluation.py -i outputs/DeSTA-ntu--DeSTA2-8B-beta/closed_ende
 
 ### Citation
 
-```
+```bibtex
 @inproceedings{Lu_interspeech,
   title     = {Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models},
   author    = {Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee},
