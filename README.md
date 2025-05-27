@@ -3,9 +3,7 @@
 
 > **Speech-IFEval: Evaluating Instruction-Following and Quantifying Catastrophic Forgetting in Speech-Aware Language Models**
 > 
-> Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee
-> 
-> National Taiwan University
+> Ke-Han Lu, Chun-Yi Kuan and Hung-yi Lee / National Taiwan University
 
 [![](https://img.shields.io/badge/arxiv-2505.19037-brightgreen)](https://arxiv.org/abs/2505.19037)
 
